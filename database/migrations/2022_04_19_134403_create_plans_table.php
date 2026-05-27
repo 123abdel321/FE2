@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 class CreatePlansTable extends Migration
 {
@@ -11,30 +12,41 @@ class CreatePlansTable extends Migration
      *
      * @return void
      */
-    public function up() {
+    public function up() 
+    {
         Schema::create('type_plans', function(Blueprint $table) {
             $table->unsignedBigInteger('id')->unique();
             $table->string('name')->unique();
             $table->unsignedBigInteger('qty_docs_invoice')->default(0);
             $table->unsignedBigInteger('qty_docs_payroll')->default(0);
-            $table->unsignedBigInteger('period')->default(0);  // 0 - Default, 1 - Monthly, 2 - Yearly, 3 - Package
+            $table->unsignedBigInteger('qty_docs_radian')->default(0);  // Añadida
+            $table->unsignedBigInteger('qty_docs_ds')->default(0);       // Añadida
+            $table->unsignedBigInteger('period')->default(0);
             $table->boolean('state')->default(true);
             $table->string('observations')->nullable();
             $table->timestamps();
         });
 
-        $table_name = 'type_plans';
-        DB::table($table_name)->delete();
-        $prefix = 'csv';
-        $key = $table_name;
-        $table = [
-            'columns' => 'id, name, qty_docs_invoice, qty_docs_payroll, period, state, observations, @created_at, @updated_at',
+        // Insertar datos manualmente
+        $data = [
+            [
+                'id' => 0,
+                'name' => 'Default - No Plan - Unlimited',
+                'qty_docs_invoice' => 0,
+                'qty_docs_payroll' => 0,
+                'qty_docs_radian' => 0,
+                'qty_docs_ds' => 0,
+                'period' => 0,
+                'state' => true,
+                'observations' => 'Default - No Plan - Unlimited',
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
         ];
-        $rutafile = public_path($prefix.DIRECTORY_SEPARATOR."{$key}.{$prefix}");
-        $rutafile = str_replace('\\', '/', $rutafile);
-        DB::connection()
-            ->getpdo()
-            ->exec("LOAD DATA LOCAL INFILE '".$rutafile."' INTO TABLE $key({$table['columns']}) SET created_at = NOW(), updated_at = NOW()");
+
+        foreach ($data as $row) {
+            DB::table('type_plans')->insert($row);
+        }
     }
 
     /**
@@ -42,7 +54,8 @@ class CreatePlansTable extends Migration
      *
      * @return void
      */
-    public function down() {
+    public function down() 
+    {
         Schema::dropIfExists('type_plans');
     }
 }
