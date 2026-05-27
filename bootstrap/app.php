@@ -41,8 +41,6 @@ $app->singleton(
     App\Exceptions\Handler::class
 );
 
-$app->register(Mtownsend\RequestXml\Providers\RequestXmlServiceProvider::class);
-
 /*
 |--------------------------------------------------------------------------
 | Return The Application

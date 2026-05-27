@@ -100,18 +100,4 @@ Route::get('invoice/pdf/{filename}', function($fisicroute)
 //mail test
 Route::get('laravel-send-email', 'EmailController@sendEMail');
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

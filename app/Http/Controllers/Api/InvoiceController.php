@@ -346,6 +346,7 @@ class InvoiceController extends Controller
         if(env('VALIDATE_BEFORE_SENDING', false)){
             $doc = Document::where('type_document_id', $request->type_document_id)->where('identification_number', $company->identification_number)->where('prefix', $resolution->prefix)->where('number', $request->number)->where('state_document_id', 1)->get();
             if(count($doc) > 0)
+                
                 return [
                     'success' => false,
                     'message' => 'Este documento ya fue enviado anteriormente, se registra en la base de datos.',
@@ -353,6 +354,19 @@ class InvoiceController extends Controller
                     'cufe' => $doc[0]->cufe,
                     'sale' => $doc[0]->total,
                 ];
+
+                // return [
+				// 	'status' => 200,
+				// 	'success' => true,
+				// 	'response' => [
+				// 		'cufe' => $cufecude,
+				// 		'StatusDescription' => "{$typeDocument->name} #{$resolution->next_consecutive} generada con éxito",
+				// 		'ResponseDian' => $respuestadian,
+				// 		'ZipBase64Bytes' => base64_encode($this->getZIP()),
+				// 		'XmlUrl' => "xml/{$company->id}/".$respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName.".xml",
+				// 		'ZipUrl' => "zip/{$company->id}/".$respuestadian->Envelope->Body->SendBillSyncResponse->SendBillSyncResult->XmlFileName.".zip"
+				// 	]
+				// ];
         }
 
         // Date time

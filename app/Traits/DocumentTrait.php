@@ -1075,14 +1075,9 @@ trait DocumentTrait
             );
         }
 
-        // Eliminar temporales
-        // Storage::disk('local')->deleteDirectory(
-        //     "zip/{$resolution->company_id}"
-        // );
-
-        // Storage::disk('local')->deleteDirectory(
-        //     "xml/{$resolution->company_id}"
-        // );
+        //DELETE LOCAL DIRECTORY
+		Storage::disk('local')->deleteDirectory("zip/{$resolution->company_id}");
+		Storage::disk('local')->deleteDirectory("xml/{$resolution->company_id}");
 
         return $this->ZipBase64Bytes = base64_encode($zipContent);
     }

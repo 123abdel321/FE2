@@ -41,8 +41,7 @@ class Kernel extends HttpKernel
         'api' => [
 /**            'throttle:60,1',		*/
             'bindings',
-            \App\Http\Middleware\ApiLog::class,
-			\Mtownsend\RequestXml\Middleware\XmlRequest::class,
+            \App\Http\Middleware\ApiLog::class
         ],
     ];
 
