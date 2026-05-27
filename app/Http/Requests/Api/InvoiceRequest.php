@@ -25,16 +25,27 @@ class InvoiceRequest extends FormRequest
      */
     public function rules()
     {
-        $this->count_resolutions = auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->count();
-        if($this->count_resolutions < 2)
-            $this->resolution = auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->first();
-        else{
-            $this->count_resolutions = auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->where('resolution', $this->resolution_number)->count();
-            if($this->count_resolutions < 2)
-                $this->resolution = auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->where('resolution', $this->resolution_number)->first();
-            else
-                $this->resolution = auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->where('resolution', $this->resolution_number)->where('prefix', $this->prefix)->first();
+        
+        $this->resolution = auth()->user()->company->resolutions
+            ->where('type_document_id', ($this->type_document_id==2?1:$this->type_document_id))
+            ->where("prefix", $this->prefix)
+            ->where('from', '<=', $this->number)
+            ->where('to', '>=', $this->number)
+            ->first();
+
+        // dd($this->resolution);
+
+        $numberRules = ['required', 'integer'];
+
+        if ($this->resolution) {
+            $numberRules[] = 'between:' . $this->resolution->from . ',' . $this->resolution->to;
+        } else {
+            // Forzar que falle la validación cuando no hay resolución
+            $numberRules[] = function ($attribute, $value, $fail) {
+                $fail('No se encontró una resolución válida para el tipo de documento, prefijo y número proporcionados.');
+            };
         }
+        
         return [
             // Adicionales Facturador
             'ivaresponsable' => 'nullable|string',
@@ -105,31 +116,15 @@ class InvoiceRequest extends FormRequest
                 'required',
                 'in:1',
                 'exists:type_documents,id',
-                new ResolutionSetting(),
+                // new ResolutionSetting(),
             ],
 
-            // Resolution number for document sending
-            'resolution_number' => Rule::requiredIf(function(){
-                if(auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->count() >= 2)
-                  return true;
-                else
-                  return false;
-            }),
-
-            // Prefijo de la resolucion a utilizar
-
-            'prefix' => Rule::requiredIf(function(){
-                if(auth()->user()->company->resolutions->where('type_document_id', $this->type_document_id)->where('resolution_number', $this->resolution_number)->count() >= 2)
-                    return true;
-                else
-                    return false;
-            }),
-
             // Consecutive
-            'number' => 'required|integer|between:'.optional($this->resolution)->from.','.optional($this->resolution)->to,
+            'number' => $numberRules,
+            'prefix' => 'required|string|nullable',
 
             // Date time
-            'date' => 'nullable|date_format:Y-m-d|after_or_equal:'.optional($this->resolution)->date_from.'|before_or_equal:'.optional($this->resolution)->date_to,
+            'date' => 'nullable|date_format:Y-m-d',
             'time' => 'nullable|date_format:H:i:s',
 
             // Notes
@@ -240,8 +235,8 @@ class InvoiceRequest extends FormRequest
             'payment_form' => 'nullable|array',
             'payment_form.payment_form_id' => 'nullable|exists:payment_forms,id',
             'payment_form.payment_method_id' => 'nullable|exists:payment_methods,id',
-            'payment_form.payment_due_date' => 'nullable|required_if:payment_form.payment_form_id,=,2|after_or_equal:date|date_format:Y-m-d',
-            'payment_form.duration_measure' => 'nullable|required_if:payment_form.payment_form_id,=,2|numeric|digits_between:1,3',
+            'payment_form.payment_due_date' => 'nullable|required_if:payment_form.payment_form_id,2|after_or_equal:date|date_format:Y-m-d',
+            'payment_form.duration_measure' => 'nullable|required_if:payment_form.payment_form_id,2|numeric|digits_between:1,3',
 
             // Allowance charges
             'allowance_charges' => 'nullable|array',

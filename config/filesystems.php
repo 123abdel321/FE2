@@ -64,6 +64,20 @@ return [
             'url' => env('AWS_URL'),
         ],
 
+        'do_spaces' => [
+            'driver' => 's3',
+            'key' => env('DO_SPACES_KEY'),
+            'secret' => env('DO_SPACES_SECRET'),
+            'region' => env('DO_SPACES_REGION', 'nyc3'),
+            'bucket' => env('DO_SPACES_BUCKET'),
+            'endpoint' => env('DO_SPACES_ENDPOINT', 'https://nyc3.digitaloceanspaces.com'),
+            'use_path_style_endpoint' => false,
+            'visibility' => 'public',
+            'options' => [
+                'suppress_php_deprecation_warning' => true,
+            ],
+        ],
+
         'dropbox' => [
             'driver' => 'dropbox',
             'authorization_token' => env('DROPBOX_AUTH_TOKEN'),
