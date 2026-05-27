@@ -454,8 +454,9 @@ class InvoiceController extends Controller
             }
         }
         else{
-            if (!is_dir(storage_path("app/public/{$company->identification_number}"))) {
-                mkdir(storage_path("app/public/{$company->identification_number}"));
+            $path = storage_path("app/public/{$company->identification_number}");
+            if (!is_dir($path)) {
+                mkdir($path, 0777, true); // El parámetro "true" crea directorios padres si no existen
             }
         }
 
