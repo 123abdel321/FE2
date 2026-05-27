@@ -15,12 +15,13 @@ class CreatePlansTable extends Migration
     public function up() 
     {
         Schema::create('type_plans', function(Blueprint $table) {
-            $table->unsignedBigInteger('id')->unique();
+            $table->id(); // PRIMARY KEY añadida
+            $table->unsignedBigInteger('plan_id')->unique(); // Cambiado de 'id' a 'plan_id'
             $table->string('name')->unique();
             $table->unsignedBigInteger('qty_docs_invoice')->default(0);
             $table->unsignedBigInteger('qty_docs_payroll')->default(0);
-            $table->unsignedBigInteger('qty_docs_radian')->default(0);  // Añadida
-            $table->unsignedBigInteger('qty_docs_ds')->default(0);       // Añadida
+            $table->unsignedBigInteger('qty_docs_radian')->default(0);
+            $table->unsignedBigInteger('qty_docs_ds')->default(0);
             $table->unsignedBigInteger('period')->default(0);
             $table->boolean('state')->default(true);
             $table->string('observations')->nullable();
@@ -30,7 +31,7 @@ class CreatePlansTable extends Migration
         // Insertar datos manualmente
         $data = [
             [
-                'id' => 0,
+                'plan_id' => 0,  // Cambiado de 'id' a 'plan_id'
                 'name' => 'Default - No Plan - Unlimited',
                 'qty_docs_invoice' => 0,
                 'qty_docs_payroll' => 0,
