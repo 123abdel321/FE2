@@ -796,8 +796,13 @@ trait DocumentTrait
                 $margin_left = $margin['left'];
             }
         }
+        
+        $tempDir = storage_path('app/mpdf');
+
         if($template){
             $pdf = new Mpdf([
+                'tempDir' => $tempDir,
+                
                 'fontDir' => array_merge($fontDirs, [
                     base_path('public/fonts/roboto/'),
                 ]),
@@ -820,6 +825,8 @@ trait DocumentTrait
         }
         else{
             $pdf = new Mpdf([
+                'tempDir' => $tempDir,
+                
                 'fontDir' => array_merge($fontDirs, [
                     base_path('public/fonts/roboto/'),
                 ]),
