@@ -146,11 +146,11 @@ class InvoiceController extends Controller
 
         // Retenciones globales
         $withHoldingTaxTotal = collect();
-//        $withHoldingTaxTotalCount = 0;
-//        $holdingTaxTotal = $request->holding_tax_total;
+        // $withHoldingTaxTotalCount = 0;
+        // $holdingTaxTotal = $request->holding_tax_total;
         foreach($request->with_holding_tax_total ?? [] as $item) {
-//            $withHoldingTaxTotalCount++;
-//            $holdingTaxTotal = $request->holding_tax_total;
+            // $withHoldingTaxTotalCount++;
+            // $holdingTaxTotal = $request->holding_tax_total;
             $withHoldingTaxTotal->push(new TaxTotal($item));
         }
 
@@ -210,7 +210,6 @@ class InvoiceController extends Controller
 
         // User company
         $company = $user->company;
-
         // Verify Certificate
         $certificate_days_left = 0;
         $c = $this->verify_certificate();
@@ -219,52 +218,52 @@ class InvoiceController extends Controller
         else
             $certificate_days_left = $c['certificate_days_left'];
 
-        if($company->type_plan->state == false)
-            return [
-                'success' => false,
-                'message' => 'El plan en el que esta registrado la empresa se encuentra en el momento INACTIVO para enviar documentos electronicos...',
-            ];
+        // if($company->type_plan?->state == false)
+        //     return [
+        //         'success' => false,
+        //         'message' => 'El plan en el que esta registrado la empresa se encuentra en el momento INACTIVO para enviar documentos electronicos...',
+        //     ];
 
-        if($company->state == false)
-            return [
-                'success' => false,
-                'message' => 'La empresa se encuentra en el momento INACTIVA para enviar documentos electronicos...',
-            ];
+        // if($company->state == false)
+        //     return [
+        //         'success' => false,
+        //         'message' => 'La empresa se encuentra en el momento INACTIVA para enviar documentos electronicos...',
+        //     ];
 
-        if($company->type_plan->period != 0 && $company->absolut_plan_documents == 0){
-            $firstDate = new DateTime($company->start_plan_date);
-            $secondDate = new DateTime(Carbon::now()->format('Y-m-d H:i'));
-            $intvl = $firstDate->diff($secondDate);
-            switch($company->type_plan->period){
-                case 1:
-                    if($intvl->y >= 1 || $intvl->m >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
-                        return [
-                            'success' => false,
-                            'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por mensualidad, por favor renueve su membresia...',
-                        ];
-                case 2:
-                    if($intvl->y >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
-                        return [
-                            'success' => false,
-                            'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por anualidad, por favor renueve su membresia...',
-                        ];
-                case 3:
-                    if($this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
-                        return [
-                            'success' => false,
-                            'message' => 'La empresa ha llegado al limite de documentos del plan por paquetes, por favor renueve su membresia...',
-                        ];
-            }
-        }
-        else{
-            if($company->absolut_plan_documents != 0){
-                if($this->qty_docs_period("ABSOLUT") >= $company->absolut_plan_documents)
-                    return [
-                        'success' => false,
-                        'message' => 'La empresa ha llegado al limite de documentos del plan mixto, por favor renueve su membresia...',
-                    ];
-            }
-        }
+        // if($company->type_plan->period != 0 && $company->absolut_plan_documents == 0){
+        //     $firstDate = new DateTime($company->start_plan_date);
+        //     $secondDate = new DateTime(Carbon::now()->format('Y-m-d H:i'));
+        //     $intvl = $firstDate->diff($secondDate);
+        //     switch($company->type_plan->period){
+        //         case 1:
+        //             if($intvl->y >= 1 || $intvl->m >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+        //                 return [
+        //                     'success' => false,
+        //                     'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por mensualidad, por favor renueve su membresia...',
+        //                 ];
+        //         case 2:
+        //             if($intvl->y >= 1 || $this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+        //                 return [
+        //                     'success' => false,
+        //                     'message' => 'La empresa ha llegado al limite de tiempo/documentos del plan por anualidad, por favor renueve su membresia...',
+        //                 ];
+        //         case 3:
+        //             if($this->qty_docs_period() >= $company->type_plan->qty_docs_invoice)
+        //                 return [
+        //                     'success' => false,
+        //                     'message' => 'La empresa ha llegado al limite de documentos del plan por paquetes, por favor renueve su membresia...',
+        //                 ];
+        //     }
+        // }
+        // else{
+        //     if($company->absolut_plan_documents != 0){
+        //         if($this->qty_docs_period("ABSOLUT") >= $company->absolut_plan_documents)
+        //             return [
+        //                 'success' => false,
+        //                 'message' => 'La empresa ha llegado al limite de documentos del plan mixto, por favor renueve su membresia...',
+        //             ];
+        //     }
+        // }
 
         // Actualizar Tablas
         $this->ActualizarTablas();
@@ -288,7 +287,7 @@ class InvoiceController extends Controller
         $invoice_doc->version_ubl_id = 1;
         $invoice_doc->ambient_id = 1;
         $invoice_doc->identification_number = $company->identification_number;
-//        $invoice_doc->save();
+        // $invoice_doc->save();
 
         // Type document
         $typeDocument = TypeDocument::findOrFail($request->type_document_id);
@@ -324,7 +323,8 @@ class InvoiceController extends Controller
 
         // Type operation id
         if(!$request->type_operation_id)
-          $request->type_operation_id = 10;
+            $request->type_operation_id = 10;
+
         $typeoperation = TypeOperation::findOrFail($request->type_operation_id);
 
         // Currency id
@@ -410,11 +410,11 @@ class InvoiceController extends Controller
 
         // Retenciones globales
         $withHoldingTaxTotal = collect();
-//        $withHoldingTaxTotalCount = 0;
-//        $holdingTaxTotal = $request->holding_tax_total;
+        // $withHoldingTaxTotalCount = 0;
+        // $holdingTaxTotal = $request->holding_tax_total;
         foreach($request->with_holding_tax_total ?? [] as $item) {
-//            $withHoldingTaxTotalCount++;
-//            $holdingTaxTotal = $request->holding_tax_total;
+            // $withHoldingTaxTotalCount++;
+            // $holdingTaxTotal = $request->holding_tax_total;
             $withHoldingTaxTotal->push(new TaxTotal($item));
         }
 
