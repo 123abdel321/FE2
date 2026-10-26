@@ -335,10 +335,18 @@ class CreditNoteController extends Controller
 
         // ============================ DIRECTORIO BASE ============================
         if ($request->GuardarEn) {
-            if (!is_dir($request->GuardarEn)) {
-                mkdir($request->GuardarEn, 0777, true);
+            $guardarEn = str_replace('\\', '/', $request->GuardarEn);
+
+            // Si la ruta NO es absoluta (Linux o Windows), la corregimos
+            if (!preg_match('#^(/|[A-Za-z]:/)#', $guardarEn)) {
+                $guardarEn = '/' . $guardarEn;
             }
-            $basePath = rtrim($request->GuardarEn, '/\\');
+
+            if (!is_dir($guardarEn)) {
+                mkdir($guardarEn, 0777, true);
+            }
+
+            $basePath = rtrim($guardarEn, '/');
         } else {
             $basePath = storage_path("app/public/{$company->identification_number}");
             if (!is_dir($basePath)) {
@@ -346,11 +354,19 @@ class CreditNoteController extends Controller
             }
         }
 
-        $signedXmlPath = $this->joinPath($basePath, "{$pf}-{$resolution->next_consecutive}.xml");
-        $zipBaseNoExt  = $this->joinPath($basePath, "{$pfs}-{$resolution->next_consecutive}");
+        // Detectar si next_consecutive ya trae el prefijo "NC"/"NCS"
+        $consecutivo        = (string) $resolution->next_consecutive;
+        $yaTienePrefijoNC   = strtoupper(substr($consecutivo, 0, strlen($pf))) === strtoupper($pf);
+        $yaTienePrefijoNCS  = strtoupper(substr($consecutivo, 0, strlen($pfs))) === strtoupper($pfs);
+
+        $nombreBase    = $yaTienePrefijoNC  ? $consecutivo : "{$pf}{$consecutivo}";
+        $nombreBaseZip = $yaTienePrefijoNCS ? $consecutivo : "{$pfs}{$consecutivo}";
+
+        $signedXmlPath = $this->joinPath($basePath, "{$nombreBase}.xml");
+        $zipBaseNoExt  = $this->joinPath($basePath, "{$nombreBaseZip}");
         $zipFilePath   = $zipBaseNoExt . ".zip";
-        $reqPath       = $this->joinPath($basePath, "Req{$pf}-{$resolution->next_consecutive}.xml");
-        $rptaPath      = $this->joinPath($basePath, "Rpta{$pf}-{$resolution->next_consecutive}.xml");
+        $reqPath       = $this->joinPath($basePath, "Req{$nombreBase}.xml");
+        $rptaPath      = $this->joinPath($basePath, "Rpta{$nombreBase}.xml");
 
         $signCreditNote->GuardarEn = $signedXmlPath;
 
