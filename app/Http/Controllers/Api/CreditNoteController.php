@@ -41,11 +41,30 @@ class CreditNoteController extends Controller
      */
     private function joinPath(string ...$parts): string
     {
+        if (empty($parts)) {
+            return '';
+        }
+
+        // Normalizar separadores
         $parts = array_map(function ($p) {
-            return trim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $p), DIRECTORY_SEPARATOR);
+            return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, (string) $p);
         }, $parts);
 
-        return implode(DIRECTORY_SEPARATOR, $parts);
+        // ¿La primera parte es absoluta? (Linux "/..." o Windows "C:/...")
+        $first = $parts[0];
+        $isAbsolute = false;
+        if ($first !== '' && ($first[0] === DIRECTORY_SEPARATOR || preg_match('#^[A-Za-z]:#', $first))) {
+            $isAbsolute = true;
+        }
+
+        // Limpiar barras sobrantes de cada parte
+        $parts = array_map(function ($p) {
+            return trim($p, DIRECTORY_SEPARATOR);
+        }, $parts);
+
+        $result = implode(DIRECTORY_SEPARATOR, array_filter($parts, fn($p) => $p !== ''));
+
+        return $isAbsolute ? DIRECTORY_SEPARATOR . $result : $result;
     }
 
     /**
