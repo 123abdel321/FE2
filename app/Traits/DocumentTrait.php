@@ -212,6 +212,15 @@ trait DocumentTrait
      */
     protected function createXML(array $data)
     {
+        if (!isset($data['date']) || empty($data['date'])) {
+            $data['date'] = $data['request']['date']
+                ?? ($data['resolution']->date_issue ?? null)
+                ?? date('Y-m-d');
+        }
+        if (!isset($data['time']) || empty($data['time'])) {
+            $data['time'] = $data['request']['time'] ?? date('H:i:s');
+        }
+
         if($data['typeDocument']['code'] === '01' or $data['typeDocument']['code'] === '02' or $data['typeDocument']['code'] === '03' or $data['typeDocument']['code'] === '05' or $data['typeDocument']['code'] === '95' or $data['typeDocument']['code'] === '91' or $data['typeDocument']['code'] === '92' or $data['typeDocument']['code'] === '20' or $data['typeDocument']['code'] === '93' or $data['typeDocument']['code'] === '94'){
             if($data['typeDocument']['code'] === '20' or $data['typeDocument']['code'] === '93' or $data['typeDocument']['code'] === '94'){
                 if($data['company']['eqdocs_type_environment_id'] == 2)
