@@ -1643,34 +1643,13 @@ trait DocumentTrait
         // -------- VALIDACIÓN: que CertificateEndDate devuelva una fecha real --------
         // Si viene binario, null, vacío, o algo que no sea dd/mm/yyyy → error claro
         if (empty($raw) || strlen($raw) > 50 || !preg_match('/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}/', $raw)) {
-
-            // Representaciones SEGURAS del $raw (nunca el binario crudo)
-            $rawInfo = [
-                'tipo'          => gettype($raw),
-                'longitud'      => is_string($raw) ? strlen($raw) : null,
-                'hex_head'      => is_string($raw) ? bin2hex(substr($raw, 0, 16)) : null,
-                'base64_head'   => is_string($raw) ? base64_encode(substr($raw, 0, 32)) : null,
-                'primeros_hex'  => is_string($raw) ? bin2hex(substr($raw, 0, 64)) : null,
-            ];
-
-            // Log completo en laravel.log (ahí sí puedes ver todo)
-            \Log::error('[verify_certificate] CertificateEndDate inválido', array_merge($rawInfo, [
-                'empresa' => $user ?? auth()->user()?->company?->identification_number,
-                'raw_len' => is_string($raw) ? strlen($raw) : null,
-                // Aquí SÍ puedes meter el binario porque va al archivo, no al JSON
-                'raw_b64' => is_string($raw) ? base64_encode($raw) : null,
-            ]));
-
             return [
                 'success' => false,
                 'message' => 'No se pudo leer la fecha de vencimiento del certificado. '
                         . 'Verifique que el archivo .p12 esté correctamente cargado y la contraseña sea la correcta. '
-                        . 'Detalle: tipo=' . $rawInfo['tipo']
-                        . ', len=' . ($rawInfo['longitud'] ?? 'N/A')
-                        . ', hex=' . ($rawInfo['hex_head'] ?? 'N/A'),
+                        . 'Detalle: CertificateEndDate devolvió un valor inválido (len=' . strlen($raw) . ').',
                 'expiration_date' => null,
                 'certificate_days_left' => 0,
-                'raw_debug' => $rawInfo,   // ← solo metadatos seguros
             ];
         }
         // ---------------------------------------------------------------------------
