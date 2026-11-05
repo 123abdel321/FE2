@@ -1639,19 +1639,38 @@ trait DocumentTrait
     {
         $c = new ConfigurationController();
         $raw = $c->CertificateEndDate($user);
-
+        
         // -------- VALIDACIÓN: que CertificateEndDate devuelva una fecha real --------
         // Si viene binario, null, vacío, o algo que no sea dd/mm/yyyy → error claro
         if (empty($raw) || strlen($raw) > 50 || !preg_match('/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}/', $raw)) {
-            return [
-                'success' => false,
-                'message' => 'No se pudo leer la fecha de vencimiento del certificado. '
-                        . 'Verifique que el archivo .p12 esté correctamente cargado y la contraseña sea la correcta. '
-                        . 'Detalle: CertificateEndDate devolvió un valor inválido (len=' . strlen($raw) . ').',
-                'expiration_date' => null,
-                'certificate_days_left' => 0,
-            ];
+
+        // Convertir a UTF-8 válido para que el JSON no falle
+        $rawPreview = is_string($raw)
+            ? mb_convert_encoding(substr($raw, 0, 200), 'UTF-8', 'UTF-8')
+            : var_export($raw, true);
+
+        // Si aún tiene bytes inválidos, reemplazarlos por "?"
+        if (!mb_check_encoding($rawPreview, 'UTF-8')) {
+            $rawPreview = preg_replace('/[^\x09\x0A\x0D\x20-\x7E]/', '?', $rawPreview);
         }
+
+        return [
+            'success' => false,
+            'message' => 'No se pudo leer la fecha de vencimiento del certificado. '
+                    . 'Verifique que el archivo .p12 esté correctamente cargado y la contraseña sea la correcta. '
+                    . 'Detalle: CertificateEndDate devolvió un valor inválido '
+                    . '(tipo=' . gettype($raw) . ', len=' . (is_string($raw) ? strlen($raw) : 'N/A') . '). '
+                    . 'RAW: ' . $rawPreview,
+            'expiration_date' => null,
+            'certificate_days_left' => 0,
+            'raw_debug' => [
+                'tipo'      => gettype($raw),
+                'longitud'  => is_string($raw) ? strlen($raw) : null,
+                'primeros'  => is_string($raw) ? substr($raw, 0, 200) : $raw,
+                'hex_head'  => is_string($raw) ? bin2hex(substr($raw, 0, 16)) : null,
+            ],
+        ];
+    }
         // ---------------------------------------------------------------------------
 
         try {
