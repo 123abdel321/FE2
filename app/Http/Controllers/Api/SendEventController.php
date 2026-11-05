@@ -1184,7 +1184,7 @@ class SendEventController extends Controller
             $invoice_doc->aceptacion = 0;
             $invoice_doc->rechazo = 0;
 
-            if($invoice_doc->customer != $company->identification_number)
+            if($invoice_doc->identification_number != $company->identification_number)
                 return [
                     'success' => false,
                     'message' => "El adquiriente no corresponde a la empresa con nit: ".$company->identification_number,
