@@ -1635,26 +1635,57 @@ trait DocumentTrait
             return $interval->days;
     }
 
-    function verify_certificate($user = FALSE){
+    function verify_certificate($user = FALSE)
+    {
         $c = new ConfigurationController();
-        $certificate_end_date = new DateTime(Carbon::parse(str_replace("/", "-", $c->CertificateEndDate($user)))->format('Y-m-d'));
+        $raw = $c->CertificateEndDate($user);
+
+        // -------- VALIDACIÓN: que CertificateEndDate devuelva una fecha real --------
+        // Si viene binario, null, vacío, o algo que no sea dd/mm/yyyy → error claro
+        if (empty($raw) || strlen($raw) > 50 || !preg_match('/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}/', $raw)) {
+            return [
+                'success' => false,
+                'message' => 'No se pudo leer la fecha de vencimiento del certificado. '
+                        . 'Verifique que el archivo .p12 esté correctamente cargado y la contraseña sea la correcta. '
+                        . 'Detalle: CertificateEndDate devolvió un valor inválido (len=' . strlen($raw) . ').',
+                'expiration_date' => null,
+                'certificate_days_left' => 0,
+            ];
+        }
+        // ---------------------------------------------------------------------------
+
+        try {
+            $certificate_end_date = new DateTime(
+                Carbon::parse(str_replace("/", "-", $raw))->format('Y-m-d')
+            );
+        } catch (\Throwable $e) {
+            return [
+                'success' => false,
+                'message' => 'No se pudo parsear la fecha del certificado: ' . $e->getMessage(),
+                'expiration_date' => null,
+                'certificate_days_left' => 0,
+            ];
+        }
+
         $actual_date = new DateTime(Carbon::now()->format('Y-m-d'));
         $interval = $actual_date->diff($certificate_end_date);
         $certificate_days_left = 0;
-        if($interval->days == 0 || $interval->invert == 1)
+
+        if ($interval->days == 0 || $interval->invert == 1) {
             return [
                 'success' => false,
                 'message' => 'El certificado digital ya se encuentra vencido...',
                 'expiration_date' => $certificate_end_date,
                 'certificate_days_left' => 0,
             ];
-        else
-            return [
-                'success' => true,
-                'message' => 'El certificado digital es valido...',
-                'expiration_date' => $certificate_end_date,
-                'certificate_days_left' => $interval->days,
-            ];
+        }
+
+        return [
+            'success' => true,
+            'message' => 'El certificado digital es valido...',
+            'expiration_date' => $certificate_end_date,
+            'certificate_days_left' => $interval->days,
+        ];
     }
 }
 
