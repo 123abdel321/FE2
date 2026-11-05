@@ -388,14 +388,25 @@ class InvoiceController extends Controller
         else
             $healthfields = NULL;
 
-        // Payment form default
-        $paymentFormAll = (object) array_merge($this->paymentFormDefault, $request->payment_form ?? []);
-        $paymentForm = PaymentForm::findOrFail($paymentFormAll->payment_form_id);
+        $paymentFormInput = $request->payment_form ?? [];
+
+        // Si el request trae al menos una forma de pago, usarla
+        if (!empty($paymentFormInput) && is_array($paymentFormInput)) {
+            $first = $paymentFormInput[0] ?? $paymentFormInput;  // soporta array de items o item único
+            $paymentFormId = (int) ($first['payment_form_id'] ?? 1);
+        } else {
+            // Fallback al default
+            $paymentFormId = (int) ($this->paymentFormDefault['payment_form_id'] ?? 1);
+        }
+
+        $paymentForm = PaymentForm::findOrFail($paymentFormId);
+
         $paymentForm->payment_method_code = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->code;
         $paymentForm->nameMethod = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->name;
         $paymentForm->payment_due_date = $paymentFormAll->payment_due_date ?? null;
         $paymentForm->duration_measure = $paymentFormAll->duration_measure ?? null;
 
+        
         // Allowance charges
         $allowanceCharges = collect();
         foreach ($request->allowance_charges ?? [] as $allowanceCharge) {
@@ -723,6 +734,8 @@ class InvoiceController extends Controller
         $paymentForm->nameMethod = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->name;
         $paymentForm->payment_due_date = $paymentFormAll->payment_due_date ?? null;
         $paymentForm->duration_measure = $paymentFormAll->duration_measure ?? null;
+
+        dd('aca mismo');
 
         // Allowance charges
         $allowanceCharges = collect();
