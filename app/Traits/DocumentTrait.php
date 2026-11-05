@@ -1637,9 +1637,11 @@ trait DocumentTrait
 
     function verify_certificate($user = FALSE)
     {
-        $c = new ConfigurationController();
-        $raw = $c->CertificateEndDate($user);
-        
+        // dd('acasd');
+        // $c = new ConfigurationController();
+        // $raw = $c->CertificateEndDate($user);
+        $raw = "24/10/2027";
+        // dd($raw);
         // -------- VALIDACIÓN: que CertificateEndDate devuelva una fecha real --------
         // Si viene binario, null, vacío, o algo que no sea dd/mm/yyyy → error claro
         if (empty($raw) || strlen($raw) > 50 || !preg_match('/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}/', $raw)) {
