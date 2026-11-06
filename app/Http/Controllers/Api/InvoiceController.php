@@ -388,23 +388,22 @@ class InvoiceController extends Controller
         else
             $healthfields = NULL;
 
-        $paymentFormInput = $request->payment_form ?? [];
+       // Payment form — leer lo que viene del request
+        $input = $request->payment_form ?? [];
+        $first = is_array($input) && isset($input[0]) ? $input[0] : $input;
 
-        // Si el request trae al menos una forma de pago, usarla
-        if (!empty($paymentFormInput) && is_array($paymentFormInput)) {
-            $first = $paymentFormInput[0] ?? $paymentFormInput;  // soporta array de items o item único
-            $paymentFormId = (int) ($first['payment_form_id'] ?? 1);
-        } else {
-            // Fallback al default
-            $paymentFormId = (int) ($this->paymentFormDefault['payment_form_id'] ?? 1);
-        }
+        $paymentFormId   = (int) ($first['payment_form_id']   ?? 1);
+        $paymentMethodId = $first['payment_method_id']         ?? 'ZZZ';
+        $paymentDueDate  = $first['payment_due_date']          ?? null;
+        $durationMeasure = $first['duration_measure']          ?? null;
 
-        $paymentForm = PaymentForm::findOrFail($paymentFormId);
+        $paymentForm   = PaymentForm::findOrFail($paymentFormId);
+        $paymentMethod = PaymentMethod::findOrFail($paymentMethodId);
 
-        $paymentForm->payment_method_code = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->code;
-        $paymentForm->nameMethod = PaymentMethod::findOrFail($paymentFormAll->payment_method_id)->name;
-        $paymentForm->payment_due_date = $paymentFormAll->payment_due_date ?? null;
-        $paymentForm->duration_measure = $paymentFormAll->duration_measure ?? null;
+        $paymentForm->payment_method_code = $paymentMethod->code;
+        $paymentForm->nameMethod          = $paymentMethod->name;
+        $paymentForm->payment_due_date    = $paymentDueDate;
+        $paymentForm->duration_measure    = $durationMeasure;
 
         
         // Allowance charges
