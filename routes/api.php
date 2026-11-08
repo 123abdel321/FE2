@@ -65,6 +65,11 @@ Route::middleware('auth:api')->group(function () {
 
     // UBL 2.1
     Route::prefix('/ubl2.1')->group(function () {
+
+        Route::prefix('/consult')->group(function () {
+            Route::post('/get-acquirer', 'Api\DianConsultController@getAcquirer');
+        });
+
         // Xml Document
         Route::prefix('/xml')->group(function () {
 	        Route::post('/document/{trackId}/{GuardarEn?}', 'Api\XmlDocumentController@document');

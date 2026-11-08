@@ -26,6 +26,7 @@
         "league/flysystem-aws-s3-v3": "^3.28",
         "mpdf/mpdf": "^8.2",
         "rguedes/pdfmerger": "^1.0",
+        "robrichards/xmlseclibs": "^4.0",
         "simplesoftwareio/simple-qrcode": "^2.0",
         "ubl21dian/torresoftware": "dev-master"
     },
