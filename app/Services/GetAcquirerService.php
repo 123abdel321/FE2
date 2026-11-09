@@ -22,7 +22,8 @@ class GetAcquirerService
     private const X509_VALUE_TYPE = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3';
     private const BASE64_ENCODING = 'http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary';
 
-    private string $endpoint   = 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc';
+    // private string $endpoint   = 'https://vpfe.dian.gov.co/WcfDianCustomerServices.svc';
+    private string $endpoint   = 'https://vpfe-hab.dian.gov.co/WcfDianCustomerServices.svc';
     private string $soapAction = 'http://wcf.dian.colombia/IWcfDianCustomerServices/GetAcquirer';
 
     public function __construct(
@@ -42,10 +43,12 @@ class GetAcquirerService
 
         $doc       = $this->buildSoapEnvelope($identificationType, $identificationNumber);
         $signedXml = $this->signXml($doc);
-
+        
         $response = Http::withOptions(['connect_timeout' => 15, 'timeout' => 45])
             ->withBody($signedXml, 'application/soap+xml; charset=utf-8; action="' . $this->soapAction . '"')
             ->post($this->endpoint);
+
+        dd($response);
 
         $body = $response->body();
 
