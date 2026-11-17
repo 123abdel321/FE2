@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d3a2189bf63b1f90c13609caa5520d5",
+    "content-hash": "b9d96cda94b6aa8d7e15b1fc4fec25a9",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2657,6 +2657,67 @@
                 }
             ],
             "time": "2024-09-21T08:32:55+00:00"
+        },
+        {
+            "name": "lopezsoft/ubl21dian",
+            "version": "3.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lopezsoft/ubl21dian.git",
+                "reference": "b0670a0117db727c2532d9a47c49733bf51d4929"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lopezsoft/ubl21dian/zipball/b0670a0117db727c2532d9a47c49733bf51d4929",
+                "reference": "b0670a0117db727c2532d9a47c49733bf51d4929",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-json": "*",
+                "ext-libxml": "*",
+                "ext-openssl": "*",
+                "ext-xml": "*",
+                "ext-xmlwriter": "*",
+                "nesbot/carbon": "^2.19 || ^3.8",
+                "php": ">= 8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lopezsoft\\UBL21dian\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lewis Lopez",
+                    "email": "soporte@matias.com.co",
+                    "homepage": "https://matias-api.com"
+                }
+            ],
+            "description": "Core for electronic invoicing pre-validation - DIAN UBL 2.1",
+            "homepage": "https://matias-api.com",
+            "keywords": [
+                "core",
+                "dian",
+                "soap dian",
+                "ubl",
+                "web service",
+                "xml"
+            ],
+            "support": {
+                "issues": "https://github.com/lopezsoft/ubl21dian/issues",
+                "source": "https://github.com/lopezsoft/ubl21dian"
+            },
+            "time": "2025-04-23T18:54:13+00:00"
         },
         {
             "name": "masterminds/html5",

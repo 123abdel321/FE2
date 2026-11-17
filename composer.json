@@ -24,6 +24,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.6",
         "league/flysystem-aws-s3-v3": "^3.28",
+        "lopezsoft/ubl21dian": "3.4",
         "mpdf/mpdf": "^8.2",
         "rguedes/pdfmerger": "^1.0",
         "robrichards/xmlseclibs": "^4.0",
