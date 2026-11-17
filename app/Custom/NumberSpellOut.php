@@ -7,9 +7,15 @@ use App\TypeCurrency;
 class NumberSpellOut
 {
     public function convertir($numero, $idcurrency = NULL)
-    {
-        $izquierda = intval(floor($numero));
-        $derecha   = round(($numero - floor($numero)) * 100, 2);
+{
+        // Guard: número inválido, vacío o no numérico
+        if ($numero === null || $numero === '' || !is_numeric($numero)) {
+            $numero = 0;
+        }
+        $numero = (float) $numero;
+
+        $izquierda = (int) floor($numero);
+        $derecha   = (int) round(($numero - floor($numero)) * 100);
 
         $letrasIzquierda = strtoupper($this->numeroALetras($izquierda));
         $letrasDerecha   = strtoupper($this->numeroALetras($derecha));
