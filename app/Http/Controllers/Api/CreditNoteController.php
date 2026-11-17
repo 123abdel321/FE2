@@ -40,7 +40,7 @@ class CreditNoteController extends Controller
      * Normaliza una ruta para que use DIRECTORY_SEPARATOR.
      */
 
-    private function joinPath(string ...$parts): string
+    private function joinPath1(string ...$parts): string
     {
         if (empty($parts)) {
             return '';
@@ -68,7 +68,7 @@ class CreditNoteController extends Controller
         return $isAbsolute ? DIRECTORY_SEPARATOR . $result : $result;
     }
 
-    private function joinPath1(string ...$parts): string
+    private function joinPath(string ...$parts): string
     {
         if (empty($parts)) {
             return '';
