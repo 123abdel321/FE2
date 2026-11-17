@@ -39,6 +39,7 @@ class CreditNoteController extends Controller
     /**
      * Normaliza una ruta para que use DIRECTORY_SEPARATOR.
      */
+
     private function joinPath(string ...$parts): string
     {
         if (empty($parts)) {
@@ -65,6 +66,42 @@ class CreditNoteController extends Controller
         $result = implode(DIRECTORY_SEPARATOR, array_filter($parts, fn($p) => $p !== ''));
 
         return $isAbsolute ? DIRECTORY_SEPARATOR . $result : $result;
+    }
+
+    private function joinPath1(string ...$parts): string
+    {
+        if (empty($parts)) {
+            return '';
+        }
+
+        // Normalizar separadores
+        $parts = array_map(function ($p) {
+            return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, (string) $p);
+        }, $parts);
+
+        $first = $parts[0];
+
+        // Detectar tipo de ruta absoluta ANTES de hacer trim
+        $isUnixAbsolute    = ($first !== '' && $first[0] === DIRECTORY_SEPARATOR);
+        $isWindowsAbsolute = (bool) preg_match('#^[A-Za-z]:#', $first);
+
+        // Limpiar barras sobrantes
+        $parts = array_map(function ($p) {
+            return trim($p, DIRECTORY_SEPARATOR);
+        }, $parts);
+
+        $result = implode(DIRECTORY_SEPARATOR, array_filter($parts, fn($p) => $p !== ''));
+
+        if ($isWindowsAbsolute) {
+            // En Windows, el primer elemento perdió la "\" después de "C:" por el trim.
+            // Reconstruimos "C:" + "\" + resto
+            $drive = strtoupper(substr($parts[0], 0, 2)); // "C:"
+            $rest  = substr($result, 2);                  // quita "C:"
+            $rest  = ltrim($rest, DIRECTORY_SEPARATOR);   // asegura sin "\" inicial
+            return $drive . DIRECTORY_SEPARATOR . $rest;
+        }
+
+        return $isUnixAbsolute ? DIRECTORY_SEPARATOR . $result : $result;
     }
 
     /**
@@ -351,7 +388,7 @@ class CreditNoteController extends Controller
             $signCreditNote->softwareID = $company->software->identifier;
             $signCreditNote->pin        = $company->software->pin;
         }
-
+        
         // ============================ DIRECTORIO BASE ============================
         if ($request->GuardarEn) {
             $guardarEn = str_replace('\\', '/', $request->GuardarEn);
@@ -393,8 +430,18 @@ class CreditNoteController extends Controller
         $sendBillSync = new SendBillSync($company->certificate->path, $company->certificate->password);
         $sendBillSync->To = $is_eqdoc ? $company->software->url_eqdocs : $company->software->url;
         $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
+        $data = compact(
+            'user', 'company', 'customer', 'taxTotals', 'withHoldingTaxTotal',
+            'resolution', 'paymentForm', 'typeDocument', 'creditNoteLines',
+            'allowanceCharges', 'legalMonetaryTotals', 'billingReference',
+            'date', 'time', 'notes', 'typeoperation', 'orderreference',
+            'discrepancycode', 'discrepancydescription', 'request',
+            'idcurrency', 'calculationrate', 'calculationratedate',
+            'healthfields', 'invoice_period'
+        );
+
         $sendBillSync->contentFile = $this->zipBase64(
-            $company, $resolution, $signCreditNote->sign($crediNote), $zipBaseNoExt
+            $company, $resolution, $signCreditNote->sign($data), $zipBaseNoExt
         );
 
         // ============================ PDF + QR ============================
