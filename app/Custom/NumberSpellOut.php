@@ -7,7 +7,8 @@ use App\TypeCurrency;
 class NumberSpellOut
 {
     public function convertir($numero, $idcurrency = NULL)
-{
+    {
+        dd($numero, $idcurrency);
         // Guard: número inválido, vacío o no numérico
         if ($numero === null || $numero === '' || !is_numeric($numero)) {
             $numero = 0;
@@ -105,10 +106,13 @@ class NumberSpellOut
      */
     private function grupoACentenas($num)
     {
+        $num = (int) $num;
+
         $centenas = [
-            0 => '', 100 => 'CIENTO', 200 => 'DOSCIENTOS', 300 => 'TRESCIENTOS',
-            400 => 'CUATROCIENTOS', 500 => 'QUINIENTOS', 600 => 'SEISCIENTOS',
-            700 => 'SETECIENTOS', 800 => 'OCHOCIENTOS', 900 => 'NOVECIENTOS'
+            0   => '',          100 => 'CIENTO',      200 => 'DOSCIENTOS',
+            300 => 'TRESCIENTOS', 400 => 'CUATROCIENTOS', 500 => 'QUINIENTOS',
+            600 => 'SEISCIENTOS', 700 => 'SETECIENTOS', 800 => 'OCHOCIENTOS',
+            900 => 'NOVECIENTOS',
         ];
 
         if ($num === 100) {
@@ -121,6 +125,7 @@ class NumberSpellOut
         if ($c > 0) {
             $texto .= $centenas[$c] . ' ';
         }
+
         $resto = $num % 100;
 
         if ($resto === 0) {
@@ -128,21 +133,31 @@ class NumberSpellOut
         }
 
         $decenas = [
-            10 => 'DIEZ', 11 => 'ONCE', 12 => 'DOCE', 13 => 'TRECE', 14 => 'CATORCE',
-            15 => 'QUINCE', 16 => 'DIECISEIS', 17 => 'DIECISIETE', 18 => 'DIECIOCHO',
-            19 => 'DIECINUEVE', 20 => 'VEINTE', 21 => 'VEINTIUNO', 22 => 'VEINTIDOS',
-            23 => 'VEINTITRES', 24 => 'VEINTICUATRO', 25 => 'VEINTICINCO',
-            26 => 'VEINTISEIS', 27 => 'VEINTISIETE', 28 => 'VEINTIOCHO',
-            29 => 'VEINTINUEVE'
+            10 => 'DIEZ',      11 => 'ONCE',       12 => 'DOCE',      13 => 'TRECE',
+            14 => 'CATORCE',   15 => 'QUINCE',     16 => 'DIECISEIS', 17 => 'DIECISIETE',
+            18 => 'DIECIOCHO', 19 => 'DIECINUEVE', 20 => 'VEINTE',    21 => 'VEINTIUNO',
+            22 => 'VEINTIDOS', 23 => 'VEINTITRES', 24 => 'VEINTICUATRO',
+            25 => 'VEINTICINCO', 26 => 'VEINTISEIS', 27 => 'VEINTISIETE',
+            28 => 'VEINTIOCHO', 29 => 'VEINTINUEVE',
         ];
 
         if (isset($decenas[$resto])) {
             return trim($texto . $decenas[$resto]);
         }
 
+        $unidades = [
+            1 => 'UNO',  2 => 'DOS',   3 => 'TRES',  4 => 'CUATRO', 5 => 'CINCO',
+            6 => 'SEIS', 7 => 'SIETE', 8 => 'OCHO',  9 => 'NUEVE',
+        ];
+
+        // ✅ FIX: resto entre 1 y 9 (sin decenas) → "CIENTO UNO", "MIL CINCO", etc.
+        if ($resto < 10) {
+            return trim($texto . $unidades[$resto]);
+        }
+
         $decenasBase = [
             30 => 'TREINTA', 40 => 'CUARENTA', 50 => 'CINCUENTA',
-            60 => 'SESENTA', 70 => 'SETENTA', 80 => 'OCHENTA', 90 => 'NOVENTA'
+            60 => 'SESENTA', 70 => 'SETENTA',  80 => 'OCHENTA',  90 => 'NOVENTA',
         ];
 
         $d = intval($resto / 10) * 10;
@@ -153,11 +168,6 @@ class NumberSpellOut
         if ($u === 0) {
             return trim($texto . $textoDecena);
         }
-
-        $unidades = [
-            1 => 'UNO', 2 => 'DOS', 3 => 'TRES', 4 => 'CUATRO', 5 => 'CINCO',
-            6 => 'SEIS', 7 => 'SIETE', 8 => 'OCHO', 9 => 'NUEVE'
-        ];
 
         return trim($texto . $textoDecena . ' Y ' . $unidades[$u]);
     }
