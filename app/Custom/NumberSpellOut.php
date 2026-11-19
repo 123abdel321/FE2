@@ -8,7 +8,6 @@ class NumberSpellOut
 {
     public function convertir($numero, $idcurrency = NULL)
     {
-        dd($numero, $idcurrency);
         // Guard: número inválido, vacío o no numérico
         if ($numero === null || $numero === '' || !is_numeric($numero)) {
             $numero = 0;
