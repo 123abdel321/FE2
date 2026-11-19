@@ -430,6 +430,7 @@ class CreditNoteController extends Controller
         $sendBillSync = new SendBillSync($company->certificate->path, $company->certificate->password);
         $sendBillSync->To = $is_eqdoc ? $company->software->url_eqdocs : $company->software->url;
         $sendBillSync->fileName = "{$resolution->next_consecutive}.xml";
+        
         $data = compact(
             'user', 'company', 'customer', 'taxTotals', 'withHoldingTaxTotal',
             'resolution', 'paymentForm', 'typeDocument', 'creditNoteLines',
@@ -440,11 +441,16 @@ class CreditNoteController extends Controller
             'healthfields', 'invoice_period'
         );
 
+        // ✅ PASO 1: Asignar $data a la propiedad del objeto (verificar nombre en Paso 0)
+        $signCreditNote->data = $data;
+
+        // ✅ PASO 2: Pasar el XML string (NO el array)
         $sendBillSync->contentFile = $this->zipBase64(
-            $company, $resolution, $signCreditNote->sign($data), $zipBaseNoExt
+            $company, $resolution, $signCreditNote->sign($crediNote), $zipBaseNoExt
         );
 
         // ============================ PDF + QR ============================
+        // $QRStr = null;
         $QRStr = $this->createPDF(
             $user, $company, $customer, $typeDocument, $resolution,
             $date, $time, $paymentForm, $request,
